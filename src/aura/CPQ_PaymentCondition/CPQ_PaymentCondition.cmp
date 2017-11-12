@@ -65,7 +65,7 @@
             </table>
 
             <section onclick="{!c.addNewPayCon}" class="slds-m-top--medium" style="cursor: pointer;">
-                <lightning:icon iconName="utility:new" size="x-small" alternativeText="addNewPayCon">TESTDIS2</lightning:icon>
+                <lightning:icon iconName="utility:new" size="x-small" alternativeText="addNewPayCon">TESTDIS2nooo</lightning:icon>
             </section>
         </div>
     </div>
