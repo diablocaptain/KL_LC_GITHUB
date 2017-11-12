@@ -1,0 +1,86 @@
+<!-- CPQ_Quote_Document.cmp -->
+<aura:component controller="CPQ_QuoteControllerExtension" 
+	implements="flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickActionWithoutHeader" 
+	access="global">
+    
+    <!-- attributes -->
+    <aura:attribute name="machines" type="CPQ_QuoteControllerExtension.QuoteLineWrapper" access="global" />
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:attribute name="SaveStatus" type="boolean" default="false"/>
+
+    <!-- doInit -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+
+    <!--loading spinner start... style=Brand Medium (blue dots)-->
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    <!-- Loading spinner end-->
+    
+    <!-- Title -->
+	<p class="slds-text-heading--label slds-m-bottom--small">
+      {!$Label.c.CPQ_Machine}
+    </p>
+    
+    <!-- Table -->
+    <table class="slds-table slds-table--bordered slds--table--striped slds-table--cell-buffer" >
+        <thead>
+            <tr class="slds-text-heading--label">
+            	<th scope="col"><span class="slds-truncate"><ui:inputCheckbox value="true" click="{!c.updateCheckboxes}"></ui:inputCheckbox></span></th>
+                <th scope="col"><span class="slds-truncate">{!$Label.c.CPQ_Product}</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.machines}" var="machine" indexVar="i">
+                <tr>
+                    <td>
+                        <ui:inputCheckbox name="{!i}" value="{!machine.selected}" click="{!c.updateCheckboxesSingle}"></ui:inputCheckbox>
+                    </td>
+                    <td>
+                        <a href="{!'/one/one.app?#/sObject/'+ machine.quoteLine.SBQQ__Product__c + '/view'}" 
+                           class="slds-text-link" >
+                            {!machine.quoteLine.CPQ_Quote_Product__r.Name}
+                        </a>
+                    </td>
+                </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+    
+	<div class="slds-docked-form-footer">
+        <lightning:button label="Save PDF" class="slds-button slds-button_neutral" onclick="{!c.onSavePdf}"  ></lightning:button>
+		<lightning:button label="Send E-mail" class="slds-button slds-button_neutral" onclick="{!c.navigateToSendEmailComponent}"  ></lightning:button>
+  		<lightning:button label="Preview" class="slds-button slds-button_neutral" onclick="{!c.onPreview}"  ></lightning:button>
+    	<lightning:button label="Cancel" class="slds-button slds-button_neutral" onclick="{!c.onCancel}"  ></lightning:button>
+	</div>
+
+    <!-- MODAL Save successful -->
+    <aura:if isTrue="{!v.SaveStatus}">
+        <div role="alertdialog" tabindex="-1" aria-labelledby="prompt-heading-id" aria-describedby="prompt-message-wrapper" class="slds-modal slds-fade-in-open slds-modal--prompt">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header slds-theme--success slds-theme--alert-texture">
+                    <h2 class="slds-text-heading--medium" id="prompt-heading-id">Status</h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <div>
+                        <p>Quote was successfully saved as PDF. Please proceed.</p>
+                    </div>
+                </div>
+                <div class="slds-modal__footer slds-theme--default">
+                    <button class="slds-button slds-button--brand" onclick="{!c.closeMessage}">Proceed</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </aura:if>
+
+</aura:component>

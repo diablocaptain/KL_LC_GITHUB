@@ -1,0 +1,66 @@
+<!-- CPQ_Quote_ShowSpecialOptionLineItems.cmp -->
+<aura:component controller="CPQ_QuoteControllerExtension" implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global">
+    
+    <!-- attributes -->
+    <aura:attribute name="quoteLines" type="SBQQ__QuoteLine__c" access="global" />
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="edit" type="Boolean" default="true"/>
+    
+    <!-- doInit -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <!-- Title -->
+	<p class="slds-text-heading--label slds-m-bottom--small">
+      {!$Label.c.CPQ_Special_Option}
+    </p>
+    
+    <!-- Table -->
+    <table class="slds-table slds-table--bordered slds--table--striped slds-table--cell-buffer" >
+        <thead>
+            <tr class="slds-text-heading--label">
+                <th scope="col"><span class="slds-truncate">{!$Label.c.CPQ_Quote_Line}</span></th>
+                <th scope="col"><span class="slds-truncate">{!$Label.c.CPQ_Group}</span></th>
+                <th scope="col"><span class="slds-truncate">{!$Label.c.CPQ_Product}</span></th>
+                <th scope="col"><span class="slds-truncate">{!$Label.c.CPQ_Net_Unit_Price}</span></th>
+                <th scope="col"><span class="slds-truncate">{!$Label.c.CPQ_Quantity}</span></th>
+                <th scope="col"><span class="slds-truncate">{!$Label.c.CPQ_Net_Total}</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.quoteLines}" var="ql">
+                
+                <tr>
+                    <td>
+                        <a href="{!'/one/one.app?#/sObject/'+ ql.Id + '/view'}" 
+                           class="slds-text-link" >
+                            {!ql.Name}
+                        </a>
+					</td>
+                    <td>
+                        <a href="{!'/one/one.app?#/sObject/'+ ql.SBQQ__Group__c + '/view'}" 
+                           class="slds-text-link" >
+                            {!ql.SBQQ__Group__r.Name}
+                        </a>
+					</td>
+                    <td>
+						<aura:if isTrue="{!ql.CPQ_Quote_Language__c == 'DE'}">
+                            {!ql.CPQ_Special_Options_German_Name__c}
+                            <aura:set attribute="else">
+                            	{!ql.CPQ_Special_Options_English_Name__c}
+                        	</aura:set>
+						</aura:if>
+					</td>
+                    <td>
+                        <lightning:formattedNumber value="{!ql.SBQQ__NetPrice__c}" style="currency" currencyCode="{!ql.CurrencyIsoCode}" />
+                    </td>
+                    <td>
+                        <lightning:formattedNumber value="{!ql.SBQQ__Quantity__c}" style="decimal"/>
+                    </td>
+                    <td>
+                        <lightning:formattedNumber value="{!ql.SBQQ__NetTotal__c}" style="currency" currencyCode="{!ql.CurrencyIsoCode}" />
+                    </td>
+                </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+</aura:component>

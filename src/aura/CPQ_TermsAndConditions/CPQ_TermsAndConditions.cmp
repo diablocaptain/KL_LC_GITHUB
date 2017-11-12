@@ -1,0 +1,90 @@
+<!--
+ - Created by MatsBöhler on 02.11.2017.
+ -->
+
+<aura:component description="CPQ_TermsAndConditions" controller="CPQ_QuoteControllerExtension" implements="flexipage:availableForAllPageTypes" access="global">
+
+    <!-- attributes -->
+    <aura:attribute name="machineId" type="Id" access="global" />
+    <aura:attribute name="termsAndConditions" type="CPQ_Terms_and_Conditions__c" access="global" />
+    <aura:attribute name="TacSaved" type="boolean" default="false"/>
+
+    <!--Initialize the component-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <div class="slds-box">
+        <!-- TERMS AND CONDITIONS -->
+        <div class="slds-page-header" style="cursor: pointer;" onclick="{!c.sectionOne}">
+            <section class="slds-clearfix">
+                <div class="slds-float--left ">
+                    <lightning:icon class="slds-show" aura:id="TaC" iconName="utility:add" size="x-small" alternativeText="Indicates add"/>
+                    <lightning:icon class="slds-hide" aura:id="TaC" iconName="utility:dash" size="x-small" alternativeText="Indicates dash"/>
+                </div>
+                <div class="slds-m-left--large">Terms and Conditions</div>
+            </section>
+        </div>
+        <div class="slds-hide slds-p-around--medium" aura:id="TaC">
+
+            <lightning:button label="Save" class="slds-button_brand slds-m-top_medium" aura:id="SaveTaC" onclick="{!c.saveTaC}"></lightning:button>
+
+            <table class="slds-table slds-table--bordered slds--table--striped slds-table--cell-buffer" >
+                <thead>
+                <tr class="slds-text-heading--label">
+                    <th scope="col"><span class="slds-truncate">Number</span></th>
+                    <th scope="col"><span class="slds-truncate">Name</span></th>
+                    <th scope="col"><span class="slds-truncate">Use Special Conditions</span></th>
+                    <th scope="col"><span class="slds-truncate">Do not print</span></th>
+
+                </tr>
+                </thead>
+                <aura:iteration items="{!v.termsAndConditions}" var="tac" indexVar="i">
+                    <tbody>
+                    <tr>
+                        <td>
+                            <a href="{!'/one/one.app?#/sObject/'+ tac.Id + '/view'}"
+                               class="slds-text-link" >
+                                    {!tac.CPQ_Order_DEV__c}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{!'/one/one.app?#/sObject/'+ tac.Id + '/view'}"
+                               class="slds-text-link" >
+                                    {!tac.CPQ_TaC_Number_Text__c}
+                            </a>
+                        </td>
+                        <td>
+                            <ui:outputCheckbox value="{!tac.CPQ_TaC_Use_Special_Conditions__c}"></ui:outputCheckbox>
+                        </td>
+                        <td>
+                            <ui:inputCheckbox value="{!tac.CPQ_Do_not_Print__c}" click="{!c.setDoNotPrint}" name="{!i}"></ui:inputCheckbox>
+                        </td>
+
+                    </tr>
+                    </tbody>
+                </aura:iteration>
+            </table>
+
+            <!--<lightning:button label="Add PayCon" class="slds-button_brand slds-m-top_medium" onclick="{!c.addTaC}"></lightning:button>-->
+
+        </div>
+    </div>
+    <!---MODAL TAC SAVED -->
+    <aura:if isTrue="{!v.TacSaved}">
+        <div role="alertdialog" tabindex="-1" aria-labelledby="prompt-heading-id" aria-describedby="prompt-message-wrapper" class="slds-modal slds-fade-in-open slds-modal--prompt">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header slds-theme--success slds-theme--alert-texture">
+                    <h2 class="slds-text-heading--medium" id="prompt-heading-id">SUCCESSFULLY SAVED TAC</h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <div>
+                        <p>LUL</p>
+                    </div>
+                </div>
+                <div class="slds-modal__footer slds-theme--default">
+                    <button class="slds-button slds-button--brand" onclick="{!c.closeMessage}">Close</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </aura:if>
+</aura:component>

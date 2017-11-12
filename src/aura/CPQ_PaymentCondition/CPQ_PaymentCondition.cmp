@@ -1,0 +1,72 @@
+<!--
+ - Created by MatsBöhler on 30.10.2017.
+ -->
+
+<aura:component description="CPQ_PaymentCondition" controller="CPQ_QuoteControllerExtension" implements="flexipage:availableForAllPageTypes" access="global">
+
+    <!-- attributes -->
+    <aura:attribute name="machineId" type="Id" access="global" />
+    <aura:attribute name="paymentConditions" type="CPQ_Payment_Conditions_Detail_Line__c" access="global" />
+
+    <!--Initialize the component-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <div class="slds-box">
+        <!-- PAYMENT CONDITIONS -->
+        <div class="slds-page-header" style="cursor: pointer;" onclick="{!c.sectionOne}">
+            <section class="slds-clearfix">
+                <div class="slds-float--left ">
+                    <lightning:icon class="slds-show" aura:id="PayCons" iconName="utility:add" size="x-small" alternativeText="Indicates add"/>
+                    <lightning:icon class="slds-hide" aura:id="PayCons" iconName="utility:dash" size="x-small" alternativeText="Indicates dash"/>
+                </div>
+                <div class="slds-m-left--large">Payment Conditions</div>
+            </section>
+        </div>
+        <div class="slds-hide slds-p-around--medium" aura:id="PayCons">
+
+            <table class="slds-table slds-table--bordered slds--table--striped slds-table--cell-buffer" >
+                <thead>
+                <tr class="slds-text-heading--label">
+                    <th scope="col"><span class="slds-truncate">Number</span></th>
+                    <th scope="col"><span class="slds-truncate">Name</span></th>
+                    <th scope="col"><span class="slds-truncate">% value</span></th>
+                    <th scope="col"><span class="slds-truncate">Manual value</span></th>
+
+                </tr>
+                </thead>
+                <aura:iteration items="{!v.paymentConditions}" var="payCon">
+                    <tbody>
+                    <tr>
+                        <td>
+                            <a href="{!'/one/one.app?#/sObject/'+ payCon.Id + '/view'}"
+                               class="slds-text-link" >
+                                    {!payCon.CPQ_Sort__c}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{!'/one/one.app?#/sObject/'+ payCon.Id + '/view'}"
+                               class="slds-text-link" >
+                                <ui:outputTextArea value="{!payCon.Z_Text__c}"></ui:outputTextArea>
+                            </a>
+                        </td>
+                        <td>
+
+
+                            <ui:outputNumber value="{!payCon.Z_Value__c}"></ui:outputNumber>
+                        </td>
+                        <td>
+
+                            <ui:outputNumber value="{!payCon.CPQ_manual_Payment_Value__c}"></ui:outputNumber>
+                        </td>
+
+                    </tr>
+                    </tbody>
+                </aura:iteration>
+            </table>
+
+            <section onclick="{!c.addNewPayCon}" class="slds-m-top--medium" style="cursor: pointer;">
+                <lightning:icon iconName="utility:new" size="x-small" alternativeText="addNewPayCon"></lightning:icon>
+            </section>
+        </div>
+    </div>
+</aura:component>

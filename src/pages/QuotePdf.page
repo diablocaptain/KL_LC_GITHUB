@@ -1,0 +1,1312 @@
+<apex:page controller="QuotePdfCtr" language="{!quote.SBQQ__QuoteLanguage__c}" renderAs="pdf"  docType="html-5.0" applyHtmlTag="false" applyBodyTag="false" showHeader="false" sidebar="false" standardStylesheets="false">
+
+    <html>
+    <head>
+
+        <style type="text/css" media="print,all">
+                body {
+                    font-family: SansSerif;
+                    font-size: 12px;
+                    margin-right: 0;
+                    padding-right: 0;
+                    background-image: url("{!if(quote.SBQQ__WatermarkShown__c, $Resource.draft, $Resource.draft_dummy)}");
+                    background-repeat: no-repeat;
+                    background-attachment: fixed;
+                    background-position: 50% 50%;
+                }
+
+                h2 {
+                    font-size: 2em;
+                    margin-bottom: 30px;
+                }
+
+                h3 {
+                    margin: 10px 0 0 2px;
+                }
+
+                h4 {
+                    margin: 0 0 0 2px;
+                    font-weight: 300;
+                }
+
+                @page {
+                    size: 8.27in 11.69in; /* DIN A4 */
+                    margin-right: 0;
+                    padding-right: 0;
+                    margin-bottom: 2cm;
+                    padding-top: 1cm;
+                    @top-right {
+                        content: element(header);
+                    }
+                    @bottom-center {
+                        content: element(footer);
+                    }
+                }
+
+                div.footer {
+                    display: block;
+                    margin-right: 1.2cm;
+                    height: 3cm;
+                    display: block;
+                    font-size: 6px;
+                    position: running(footer);
+                }
+
+                div.footer-spacer {
+                    width:33.2%;
+                    display: inline-block;
+                }
+
+                div.page-number-block {
+                    width:33%;
+                    text-align: center;
+                    font-size: 12px;
+                    display: inline-block;
+                }
+
+                div.footer-text {
+                    width:33.2%;
+                    text-align: right;
+                    font-size: 9px;
+                    display: inline-block;
+                    color: #A9A9A9;
+                }
+
+                span.page-number:before {
+                    content: counter(page);
+                }
+
+                span.pages-number:before {
+                    content: counter(pages);
+                }
+
+                .table-wrapper {
+                    width: 100%;
+                    border-top: 1px black solid;
+                    text-align: center;
+                }
+
+                .table-wrapper table {
+                    display: inline-block;
+                    text-align: left;
+                    margin-top: 5px;
+                }
+
+                .table-wrapper table th {
+                    margin: 0 0.1cm 0.05cm 0;
+                    padding: 0 0.3cm;
+                }
+
+                .table-wrapper table td {
+                    margin: 0 0.1cm 0.05cm 0;
+                    padding: 0 0.3cm;
+                }
+
+                div.header {
+                    margin-right: 1.2cm;
+                    padding: 10px;
+                    position: running(header);
+                    text-align: right;
+                }
+
+                .content-block {
+                    margin-right: 1.5cm;
+                }
+
+                .cover-page {
+                    width: 100%;
+                    text-align: right;
+                    margin-right: 0;
+                }
+
+                .cover-image {
+                    margin-top: 5cm;
+                    display: inline-block;
+                }
+
+                .cover-text {
+                    margin-top: 1cm;
+                    text-align: right;
+                    vertical-align: top;
+                    width: 100%;
+                }
+
+                .cover-quote-text {
+                    text-align: left;
+                    display: inline-block;
+                    width: 30%;
+                    font-size: 2em;
+                    vertical-align: top;
+                }
+
+                .cover-quote-text h1 {
+                    margin-top: 0;
+                }
+
+                .cover-machine-text {
+                    text-align: left;
+                    display: inline-block;
+                    width: 50%;
+                }
+
+                .cover-machine-text h3{
+                    margin-top: 0;
+                    margin-left: 0;
+                }
+
+
+                .cover-letter {
+                }
+
+                .cover-letter-addressee {
+                    margin: 20px 0;
+                }
+
+                .cover-letter-addressee p {
+                    margin: 0;
+                }
+
+                .cover-letter-head table {
+                    width: 100%;
+                    margin: 0;
+                    padding: 0;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                }
+
+                .cover-letter-desc-head table {
+                    width: 100%;
+                    margin: 20px 0;
+                    border-collapse: collapse;
+                }
+
+                .cover-letter-desc-head th {
+                    width: 15%;
+                }
+
+                .cover-letter-close table {
+                    width: 80%;
+                    text-align: center;
+                    border-collapse: collapse;
+                }
+
+                .quote-description {
+                }
+
+                .detail-picture {
+                    margin-top: 1cm;
+                    text-align: right;
+                }
+
+                .quote-options table {
+                    width: 100%;
+                }
+
+                .quote-options th {
+                    vertical-align: top;
+                }
+
+                .quote-options-price {
+                    vertical-align: bottom;
+                    text-align: right;
+                }
+
+                .quote-additionaloptions table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+
+                .quote-additionaloptions th {
+                    vertical-align: top;
+                }
+
+                .quote-technicaldata table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+
+                .quote-technicaldata th {
+                    font-size: 1.2em;
+                    padding-top: 10px;
+                    text-decoration: underline;
+                }
+
+                .quote-technicaldata td {
+                    vertical-align: top;
+                }
+
+                .quote-technicaldata-comment {
+                    margin-top: 20px;
+                }
+
+                .quote-terms th {
+                    padding-top: 10px;
+                }
+
+                .quote-terms h3 {
+                    margin-left: 0px;
+                }
+
+                .machine-total {
+                    font-weight: 900;
+                    text-align:right;
+                }
+
+                .sfdc_richtext * {
+                  font-family:"SansSerif" !important;
+                  font-size:3px !important;
+                  color: blue;
+                }
+
+            </style>
+
+    </head>
+
+    <body>
+
+    <div class="header">
+        <apex:image url="{!$Resource.KL_Header_Large}" width="140" />
+    </div>
+
+    <div class="cover-page" style="page-break-after:always;">
+        <div class="cover-image">
+            <apex:image url="{!$Resource.Gobal_Offer_Picture}" width="700" />
+        </div>
+        <div class="cover-text">
+            <div class="cover-quote-text">
+                <h1>
+                        {!$Label.Template_Quote}
+                </h1>
+            </div>
+            <div class="cover-machine-text">
+                <apex:repeat value="{!baseMachines}" var="baseMachine">
+                    <p>
+                    <h3>{!baseMachine.machine.SBQQ__ProductName__c}</h3>
+                    </p>
+                </apex:repeat>
+            </div>
+        </div>
+    </div>
+
+    <div class="header">
+        <apex:image url="{!$Resource.companylogo}" width="80" />
+    </div>
+
+    <div class="footer">
+        <div>
+            <div class="footer-spacer">
+            </div>
+            <div class="page-number-block">
+            {!$Label.CPQ_Page} <span class="page-number" /> {!$Label.CPQ_Of} <span class="pages-number" />
+            </div>
+            <div class="footer-text">
+                    {!footerText}
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <table >
+                <tr>
+                    <apex:repeat value="{!footerColumns}" var="footer">
+                        <th>{!footer.Header_Line__c}</th>
+                    </apex:repeat>
+                </tr>
+                <tr>
+                    <apex:repeat value="{!footerColumns}" var="footer">
+                        <td>{!footer.Footer_Line_1__c}</td>
+                    </apex:repeat>
+                </tr>
+                <tr>
+                    <apex:repeat value="{!footerColumns}" var="footer">
+                        <td>{!footer.Footer_Line_2__c}</td>
+                    </apex:repeat>
+                </tr>
+                <tr>
+                    <apex:repeat value="{!footerColumns}" var="footer">
+                        <td>{!footer.Footer_Line_3__c}</td>
+                    </apex:repeat>
+                </tr>
+                <tr>
+                    <apex:repeat value="{!footerColumns}" var="footer">
+                        <td>{!footer.Footer_Line_4__c}</td>
+                    </apex:repeat>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="cover-letter content-block">
+        <div class="cover-letter-address">
+                {!companyAddress}
+        </div>
+        <div class="cover-letter-addressee">
+            <p>
+                    {!quote.SBQQ__BillingName__c}
+            </p>
+            <p>
+                    {!quote.SBQQ__PrimaryContact__r.Name}
+            </p>
+            <p>
+                    {!quote.SBQQ__BillingStreet__c}
+            </p>
+            <p>
+            {!quote.SBQQ__BillingPostalCode__c}&nbsp;{!quote.SBQQ__BillingCity__c}
+            </p>
+            <p>
+                    {!quote.SBQQ__BillingCountry__c}
+            </p>
+        </div>
+
+        <div class="cover-letter-head">
+            <table>
+                <tr>
+                    <th style="padding-left: 0">{!$Label.CPQ_Your_Sign}</th>
+                    <th>{!$Label.CPQ_Your_Message_From}</th>
+                    <th>{!$Label.CPQ_Our_Sign}</th>
+                    <th>{!$Label.CPQ_Our_Phone}</th>
+                    <th>{!$Label.CPQ_Date}</th>
+                </tr>
+                <tr>
+                    <td style="padding-left: 0">{!quote.CPQ_your_reference__c}</td>
+                    <td>{!quote.CPQ_your_message_from__c}</td>
+                    <td>{!quote.CPQ_our_reference__c}</td>
+                    <td>{!quote.SBQQ__SalesRep__r.Phone}</td>
+                    <td>
+                        <apex:outputText value="{0, date, dd.MM.YYYY}" rendered="{!quote.SBQQ__QuoteLanguage__c == 'DE'}">
+                            <apex:param value="{!NOW()}" />
+                        </apex:outputText>
+                        <apex:outputText value="{0, date, MM-dd-YYYY}" rendered="{!quote.SBQQ__QuoteLanguage__c == 'EN'}">
+                            <apex:param value="{!NOW()}" />
+                        </apex:outputText>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="cover-letter-desc-head">
+            <table>
+                <tr>
+                    <th style="padding-left: 0">{!$Label.CPQ_Quote_No_Short}</th>
+                    <td>{!quote.CPQ_Quote_Number__c}</td>
+                </tr>
+                <tr>
+                    <th style="padding-left: 0">{!$Label.CPQ_Quote_Subject}</th>
+                    <td>{!quote.CPQ_Quote_Subject__c}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="cover-letter-desc">
+            <p>
+                    {!quote.CPQ_Letter_Salutation__c}
+            </p>
+            <apex:outputText value="{!quote.CPQ_Project_Description__c}" escape="false"/>
+        </div>
+
+        <div class="cover-letter-close">
+            <p>
+                    {!$Label.CPQ_Complimentary_Close}
+            </p>
+            <p>
+                    {!$Label.CPQ_Quote_Klingenberg_Name}
+            </p>
+            <p>
+                    {!quote.SBQQ__SalesRep__r.Name}
+            </p>
+
+            <p>
+                <apex:image url="{!$Resource[signatureSalesRep]}" width="200" rendered="{!IF(quote.SBQQ__SalesRep__c != null, true, false)}"/>
+            </p>
+            <!--
+                    <table>
+                        <tr>
+                            <td>{!quote.SBQQ__SalesRep__r.Name}</td>
+                            <td>{!quote.CPQ_Singner_2_Approver__r.Name}</td>
+                        </tr>
+                        <tr>
+                            <td><apex:image url="{!$Resource[signatureSalesRep]}" width="200" rendered="{!IF(quote.SBQQ__SalesRep__c != null, true, false)}"/></td>
+                            <td><apex:image url="{!$Resource[signatureApprover]}" width="200" rendered="{!IF(quote.CPQ_Singner_2_Approver__c != null, true, false)}"/></td>
+                        </tr>
+                    </table>
+                    -->
+        </div>
+    </div>
+
+    <apex:repeat value="{!baseMachines}" var="baseMachine">
+        <div class="quote-group" style="page-break-before:always;">
+            <div class="cover-page" style="page-break-after:always;">
+                <div class="cover-image">
+                    <apex:image rendered="{!baseMachine.groupPictureId != null}" url="{!URLFOR($Action.Attachment.Download, baseMachine.groupPictureId)}" width="700" />
+                </div>
+                <div class="cover-text">
+                    <div class="cover-quote-text">
+                        <h1>
+                                {!$Label.Template_Quote}
+                        </h1>
+                    </div>
+                    <div class="cover-machine-text">
+                        <p><h3>{!baseMachine.machine.SBQQ__ProductName__c}</h3></p>
+
+                        <p>
+                            <br/>
+                        </p>
+                        <p>
+                            <b>{!$Label.CPQ_Delivery_Address}:</b>
+                        </p>
+                        <p>
+                                {!baseMachine.machine.Ship_to_Account_Name__c}
+
+                        </p>
+                        <p>
+                                {!baseMachine.machine.ShippingStreet__c}
+                        </p>
+                        <p>
+                                {!baseMachine.machine.Delivery_Adress_house_post_code__c}
+                        </p>
+                        <p>
+                                {!baseMachine.machine.Delivery_Adress_house_post_code__c}
+                        </p>
+                        <p>
+                        {!baseMachine.machine.ShippingPostalCode__c} {!baseMachine.machine.ShippingCity__c}
+                        </p>
+                        <p>
+                                {!baseMachine.machine.ShippingCountry__c}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <apex:outputPanel rendered="{!baseMachine.machine.CPQ_Machine_Project_Description__c != null}">
+                <div class="cover-letter content-block" style="page-break-after:always;">
+                    <div class="cover-letter-address">
+                            {!companyAddress}
+                    </div>
+                    <div class="cover-letter-addressee">
+                        <p>
+                                {!quote.SBQQ__BillingName__c}
+                        </p>
+                        <p>
+                                {!quote.SBQQ__PrimaryContact__r.Name}
+                        </p>
+                        <p>
+                                {!quote.Delivery_Adress_house_post_code__c}
+                        </p>
+                        <p>
+                                {!quote.SBQQ__BillingStreet__c}
+                        </p>
+                        <p>
+                                {!quote.SBQQ__BillingPostalCode__c}
+                        </p>
+                        <p>
+                                {!quote.SBQQ__BillingCity__c}
+                        </p>
+                        <p>
+                                {!quote.SBQQ__BillingCountry__c}
+                        </p>
+                    </div>
+
+                    <div class="cover-letter-head">
+                        <table>
+                            <tr>
+                                <th style="padding: 0">{!$Label.CPQ_Your_Sign}</th>
+                                <th>{!$Label.CPQ_Your_Message_From}</th>
+                                <th>{!$Label.CPQ_Our_Sign}</th>
+                                <th>{!$Label.CPQ_Our_Phone}</th>
+                                <th><apex:outputText value="{!$Label.CPQ_Supplier_Number}" rendered="{!quote.Delivery_Adress_supplier_number__c}" /></th>
+                                <th>{!$Label.CPQ_Date}</th>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0">{!quote.CPQ_your_reference__c}</td>
+                                <td>{!quote.CPQ_your_message_from__c}</td>
+                                <td>{!quote.CPQ_our_reference__c}</td>
+                                <td>{!quote.SBQQ__SalesRep__r.Phone}</td>
+                                <td>{!quote.Delivery_Adress_supplier_number__c}</td>
+                                <td>
+                                    <apex:outputText value="{0, date, dd.MM.YYYY}" rendered="{!quote.SBQQ__QuoteLanguage__c == 'DE'}">
+                                        <apex:param value="{!NOW()}" />
+                                    </apex:outputText>
+                                    <apex:outputText value="{0, date, MM-dd-YYYY}" rendered="{!quote.SBQQ__QuoteLanguage__c == 'EN'}">
+                                        <apex:param value="{!NOW()}" />
+                                    </apex:outputText>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="cover-letter-desc-head">
+                        <table>
+                            <tr>
+                                <th style="padding: 0">{!$Label.CPQ_Quote_No_Short}</th>
+                                <td>{!quote.CPQ_Quote_Number__c}</td>
+                            </tr>
+                            <tr>
+                                <th style="padding: 0">{!$Label.CPQ_Quote_Subject}</th>
+                                <td>{!quote.CPQ_Quote_Subject__c}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="cover-letter-desc">
+                        <p>
+                                {!quote.CPQ_Letter_Salutation__c}
+                        </p>
+                        <apex:outputText value="{!baseMachine.machine.CPQ_Machine_Project_Description__c}" escape="false"/>
+                    </div>
+
+                    <div class="cover-letter-close">
+                        <p>
+                                {!$Label.CPQ_Complimentary_Close}
+                        </p>
+                        <p>
+                                {!$Label.CPQ_Quote_Klingenberg_Name}
+                        </p>
+                        <p>
+                                {!quote.SBQQ__SalesRep__r.Name}
+                        </p>
+                        <p>
+                            <apex:image url="{!$Resource[signatureSalesRep]}" width="200" rendered="{!IF(quote.SBQQ__SalesRep__c != null, true, false)}"/>
+                        </p>
+                        <!--
+                                <table>
+                                    <tr>
+                                        <td>{!quote.SBQQ__SalesRep__r.Name}</td>
+                                        <td>{!quote.CPQ_Singner_2_Approver__r.Name}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><apex:image url="{!$Resource[signatureSalesRep]}" width="200" rendered="{!IF(quote.SBQQ__SalesRep__c != null, true, false)}"/></td>
+                                        <td><apex:image url="{!$Resource[signatureApprover]}" width="200" rendered="{!IF(quote.CPQ_Singner_2_Approver__c != null, true, false)}"/></td>
+                                    </tr>
+                                </table>
+                                -->
+                    </div>
+                </div>
+            </apex:outputPanel>
+
+            <div class="quote-description content-block" style="page-break-after:always;">
+                <h2>
+                        {!$Label.CPQ_Product_Description}
+                </h2>
+                <apex:outputText value="{!baseMachine.description.CPQ_prod_desc_base_machine_description__c}" escape="false"/>
+                <div class="detail-picture">
+                    <apex:image rendered="{!baseMachine.detailPictureId != null}" url="{!URLFOR($Action.Attachment.Download, baseMachine.detailPictureId)}" width="300" />
+                </div>
+            </div>
+
+            <div class="quote-technicaldata content-block" style="page-break-after:always;">
+                <h2>
+                        {!$Label.CPQ_Technical_Data}
+                </h2>
+
+                <table>
+                    <apex:repeat value="{!baseMachine.technicalDatasheetGroups}" var="technicalDatasheetGroup">
+                        <tr>
+                            <th colspan="4">
+                                <apex:outputText value="{!technicalDatasheetGroup.name}" rendered="{!!technicalDatasheetGroup.hide}" />
+                            </th>
+                        </tr>
+                        <apex:repeat value="{!technicalDatasheetGroup.technicalDatasheets}" var="technicalDatasheet">
+                            <tr>
+                                <td>
+                                    <apex:outputText value="{!technicalDatasheet.CPQ_Text__c}" escape="false" rendered="{!!technicalDatasheet.CPQ_Is_Note__c}" />
+                                </td>
+                                <td>
+                                    <apex:outputText value="{!technicalDatasheet.CPQ_Range__c}" escape="false" rendered="{!!technicalDatasheet.CPQ_Is_Note__c}" />
+                                </td>
+                                <td>
+                                    <apex:outputText value="{!technicalDatasheet.CPQ_Value__c}" escape="false" rendered="{!!technicalDatasheet.CPQ_Is_Note__c}" />&nbsp;
+                                    <apex:outputText value="{!technicalDatasheet.CPQ_Unit__c}" escape="false" rendered="{!!technicalDatasheet.CPQ_Is_Note__c}" />
+                                </td>
+                                <td>
+
+                                    <apex:outputText value="{!technicalDatasheet.CPQ_Option1__c}" rendered="{!quote.CPQ_Technical_Data_Sheet_Printout__c == 'with Optional 1 Values' && !technicalDatasheet.CPQ_Is_Note__c}" />
+                                    <apex:outputText value="{!technicalDatasheet.CPQ_Option1__c}" rendered="{!quote.CPQ_Technical_Data_Sheet_Printout__c == 'with Optional 2 Values' && !technicalDatasheet.CPQ_Is_Note__c}" />
+                                </td>
+                            </tr>
+                            <apex:outputText value="" escape="false" rendered="{!technicalDatasheet.CPQ_Is_Note__c}" > <br/> </apex:outputText>
+                            <apex:outputText value="{!technicalDatasheet.CPQ_Addional_comment__c}" escape="false" rendered="{!technicalDatasheet.CPQ_Is_Note__c}" />
+                        </apex:repeat>
+                    </apex:repeat>
+                </table>
+                <!--
+                        <table class="quote-technicaldata-comment">
+                            <apex:repeat value="{!baseMachine.technicalDatasheetGroups}" var="technicalDatasheetGroup">
+                                <apex:repeat value="{!technicalDatasheetGroup.technicalDatasheets}" var="technicalDatasheet">
+                                    <apex:outputPanel rendered="{!technicalDatasheet.CPQ_Is_Note__c}">
+                                        <tr>
+                                            <td>
+                                                <apex:outputText value="{!technicalDatasheet.CPQ_Addional_comment__c}" escape="false"/>
+                                            </td>
+                                        </tr>
+                                    </apex:outputPanel>
+                                </apex:repeat>
+                            </apex:repeat>
+                        </table> -->
+            </div>
+            <!-- MACHINE OPTION -->
+            <div class="quote-options content-block" style="page-break-after:always;">
+                <!--<div style="page-break-inside:avoid">-->
+                    <h2>
+                            {!$Label.CPQ_Machine_Options}
+                    </h2>
+                    <h3>
+                            {!baseMachine.machine.CPQ_Product_Group_Name__c}
+                    </h3>
+                    <h4>
+                        <apex:outputText value="{!baseMachine.machine.CPQ_Product_Group_Description__c}" escape="false"/>
+                    </h4>
+
+                    <table>
+
+
+
+                        <tr>
+                            <th width="5%">{!baseMachine.machine.CPQ_SAP_Technical_Product_Code__c}</th>
+                            <th width="80%"><b><apex:outputText value="{!baseMachine.description.CPQ_prod_desc_product_name__c}" escape="true"></apex:outputText> </b></th>
+                            <th width="15%"></th>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+
+                            </td>
+                            <td>
+                                <!--<div style="page-break-inside: avoid;" >-->
+                                    <apex:outputText value="{!baseMachine.description.CPQ_prod_descr_med_machine_description__c}" rendered="{!quote.CPQ_Product_description_short_Medium__c == 'medium'}" escape="false"  />
+                                    <apex:outputText value="{!baseMachine.description.CPQ_prod_desc_short_machine_description__c}" rendered="{!quote.CPQ_Product_description_short_Medium__c == 'short'}" escape="false" />
+                                <!--</div>-->
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+
+                                <apex:outputPanel rendered="{!baseMachine.machine.SBQQ__Quantity__c == 1}">
+                                {!baseMachine.machine.SBQQ__Quantity__c}&nbsp;{!$Label.CPQ_Piece} ...........................................................................................................................................................
+                                </apex:outputPanel>
+
+                                <apex:outputPanel rendered="{!baseMachine.machine.SBQQ__Quantity__c > 1}">
+                                {!baseMachine.machine.SBQQ__Quantity__c}&nbsp;{!$Label.CPQ_Pieces} ...........................................................................................................................................................
+                                </apex:outputPanel>
+
+                            </td>
+                            <td class="quote-options-price">
+
+                                <apex:outputText rendered="{!quote.SBQQ__QuoteLanguage__c == 'EN'}" >
+                                    <span ><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!IF(baseMachine.machine.CPQ_Calculation_Total__c == 0, NULL, baseMachine.machine.CPQ_Calculation_Total__c)}"/></apex:outputText> </span>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!quote.SBQQ__QuoteLanguage__c != 'EN'}" >
+                                    <span >{!IF(baseMachine.machine.CPQ_Calculation_Total__c == 0, NULL, IF(baseMachine.machine.CPQ_Calculation_Total__c < 0, "-", "") & IF(ABS(baseMachine.machine.CPQ_Calculation_Total__c) >= 1000000, TEXT(FLOOR(ABS(baseMachine.machine.CPQ_Calculation_Total__c) / 1000000)) & ".", "") & IF(ABS(baseMachine.machine.CPQ_Calculation_Total__c) >= 1000, RIGHT(TEXT(FLOOR(ABS(baseMachine.machine.CPQ_Calculation_Total__c) / 1000)), 3) & ".", "") & RIGHT(TEXT(FLOOR(ABS(baseMachine.machine.CPQ_Calculation_Total__c))), 3) & "," & IF(MOD(ABS(baseMachine.machine.CPQ_Calculation_Total__c) , 1) * 100 < 10, "0" & TEXT(ROUND(MOD(ABS(baseMachine.machine.CPQ_Calculation_Total__c) , 1), 2) * 100), TEXT(MIN(ROUND(MOD(ABS(baseMachine.machine.CPQ_Calculation_Total__c) , 1), 2) * 100, 99))))} </span>
+
+                                </apex:outputText>
+                                    {!baseMachine.machine.CPQ_Calculation_Print_Currency__c}
+                            </td>
+                        </tr>
+
+
+                    </table>
+                <!--</div>-->
+                <!-- Additional text in seperate section -->
+                <div style="page-break-inside:avoid">
+                    <table>
+
+                        <tr>
+                            <td width="5%"></td>
+                            <td width="80%">
+                                <div style="page-break-inside: avoid;" >
+                                    <apex:outputText value="{!baseMachine.description.CPQ_prod_descr_requirements_Text__c}" rendered="{!showRequirementsText}" escape="false"/>
+                                </div>
+                            </td>
+                            <td width="15%"></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <apex:outputText value="{!baseMachine.description.CPQ_prod_descr_Additional_Text__c}" rendered="{!showAdditionalText && baseMachine.description.CPQ_Print_Colour__c == 'red'}" escape="false" style="color: red;"/>
+                                <apex:outputText value="{!baseMachine.description.CPQ_prod_descr_Additional_Text__c}" rendered="{!showAdditionalText && baseMachine.description.CPQ_Print_Colour__c == 'blue'}" escape="false" style="color: blue;"/>
+                                <apex:outputText value="{!baseMachine.description.CPQ_prod_descr_Additional_Text__c}" rendered="{!showAdditionalText && baseMachine.description.CPQ_Print_Colour__c == null}" escape="false" style="color: black;"/>
+                            </td>
+                            <td></td>
+                        </tr>
+
+
+                    </table>
+                </div>
+
+                <!-- MACHINE OPTIONS REGULAR-->
+                <apex:repeat value="{!baseMachine.productGroups}" var="productGroup">
+
+                    <apex:outputPanel rendered="{! !productGroup.specialItems && !productGroup.optionalItems}">
+                        <!-- PRODUCT GROUP OPTION TOP-->
+                        <div style="page-break-inside:avoid">
+                            <h3>
+                                    {!productGroup.name}
+                            </h3>
+                            <h4>
+                                <apex:outputText value="{!productGroup.productDescription}" escape="false"/>
+                            </h4>
+                            <table>
+
+                                <tr>
+                                    <th width="5%">{!productGroup.machineItemTop.machine.CPQ_SAP_Technical_Product_Code__c}</th>
+                                    <th width="80%"><b><apex:outputText value="{!productGroup.machineItemTop.description.CPQ_prod_desc_product_name__c}" escape="true"></apex:outputText></b></th>
+                                    <th width="15%"></th>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>
+
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+
+                                    </td>
+                                    <td>
+                                        <div style="page-break-inside: avoid;" >
+                                            <apex:outputText value="{!productGroup.machineItemTop.description.CPQ_prod_descr_med_machine_description__c}" rendered="{!quote.CPQ_Product_description_short_Medium__c == 'medium'}" escape="false"/>
+                                            <apex:outputText value="{!productGroup.machineItemTop.description.CPQ_prod_desc_short_machine_description__c}" rendered="{!quote.CPQ_Product_description_short_Medium__c == 'short'}" escape="false"/>
+                                        </div>
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>
+
+                                        <apex:outputPanel rendered="{!productGroup.machineItemTop.machine.SBQQ__Quantity__c == 1}">
+                                        {!productGroup.machineItemTop.machine.SBQQ__Quantity__c}&nbsp;{!$Label.CPQ_Piece} ...........................................................................................................................................................
+                                        </apex:outputPanel>
+
+                                        <apex:outputPanel rendered="{!productGroup.machineItemTop.machine.SBQQ__Quantity__c > 1}">
+                                        {!productGroup.machineItemTop.machine.SBQQ__Quantity__c}&nbsp;{!$Label.CPQ_Pieces} ...........................................................................................................................................................
+                                        </apex:outputPanel>
+
+                                    </td>
+                                    <td class="quote-options-price">
+
+                                        <apex:outputText rendered="{!quote.SBQQ__QuoteLanguage__c == 'EN'}" >
+                                            <span ><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!IF(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c == 0, NULL, productGroup.machineItemTop.machine.CPQ_Calculation_Total__c)}"/></apex:outputText> </span>
+                                        </apex:outputText>
+                                        <apex:outputText rendered="{!quote.SBQQ__QuoteLanguage__c != 'EN'}" >
+                                            <span >{!IF(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c == 0, NULL, IF(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c < 0, "-", "") & IF(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) >= 1000000, TEXT(FLOOR(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) / 1000000)) & ".", "") & IF(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) >= 1000, RIGHT(TEXT(FLOOR(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) / 1000)), 3) & ".", "") & RIGHT(TEXT(FLOOR(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c))), 3) & "," & IF(MOD(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) , 1) * 100 < 10, "0" & TEXT(ROUND(MOD(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) , 1), 2) * 100), TEXT(MIN(ROUND(MOD(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) , 1), 2) * 100, 99))))} </span>
+
+                                        </apex:outputText>
+                                            {!productGroup.machineItemTop.machine.CPQ_Calculation_Print_Currency__c}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>
+                                        <div style="page-break-inside: avoid;" >
+                                            <apex:outputText value="{!productGroup.machineItemTop.description.CPQ_prod_descr_requirements_Text__c}" rendered="{!showRequirementsText}" escape="false"/>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>
+                                        <apex:outputText value="{!baseMachine.description.CPQ_prod_descr_Additional_Text__c}" rendered="{!showAdditionalText && baseMachine.description.CPQ_Print_Colour__c == 'red'}" escape="false" style="color: red;"/>
+                                        <apex:outputText value="{!baseMachine.description.CPQ_prod_descr_Additional_Text__c}" rendered="{!showAdditionalText && baseMachine.description.CPQ_Print_Colour__c == 'blue'}" escape="false" style="color: blue;"/>
+                                        <apex:outputText value="{!baseMachine.description.CPQ_prod_descr_Additional_Text__c}" rendered="{!showAdditionalText && baseMachine.description.CPQ_Print_Colour__c == null}" escape="false" style="color: black;"/>
+                                    </td>
+                                    <td></td>
+                                </tr>
+
+
+                            </table>
+                        </div>
+
+                        <!-- PRODUCT GROUP OPTIONS -->
+                        <apex:repeat value="{!productGroup.machineItems}" var="item">
+                            <div style="page-break-inside: avoid;" >
+                                <table>
+
+                                    <tr>
+                                        <th width="5%">{!item.machine.CPQ_SAP_Technical_Product_Code__c}</th>
+                                        <th width="80%"><b><apex:outputText value="{!item.description.CPQ_prod_desc_product_name__c}" escape="true"></apex:outputText></b></th>
+                                        <th width="15%"></th>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+
+                                        </td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+
+                                        </td>
+                                        <td>
+                                            <div style="page-break-inside: avoid;" >
+                                                <apex:outputText value="{!item.description.CPQ_prod_descr_med_machine_description__c}" rendered="{!quote.CPQ_Product_description_short_Medium__c == 'medium'}" escape="false"/>
+                                                <apex:outputText value="{!item.description.CPQ_prod_desc_short_machine_description__c}" rendered="{!quote.CPQ_Product_description_short_Medium__c == 'short'}" escape="false"/>
+                                            </div>
+                                        </td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+
+                                            <apex:outputPanel rendered="{!item.machine.SBQQ__Quantity__c == 1}">
+                                            {!item.machine.SBQQ__Quantity__c}&nbsp;{!$Label.CPQ_Piece} ...........................................................................................................................................................
+                                            </apex:outputPanel>
+
+                                            <apex:outputPanel rendered="{!item.machine.SBQQ__Quantity__c > 1}">
+                                            {!item.machine.SBQQ__Quantity__c}&nbsp;{!$Label.CPQ_Pieces} ...........................................................................................................................................................
+                                            </apex:outputPanel>
+
+                                        </td>
+                                        <td class="quote-options-price">
+                                            <apex:outputText rendered="{!quote.SBQQ__QuoteLanguage__c == 'EN'&& item.machine.CPQ_Calculation_Total__c != null && item.machine.CPQ_Calculation_Total__c != 0}" >
+                                                <span ><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!item.machine.CPQ_Calculation_Total__c}"/></apex:outputText> </span>
+                                            </apex:outputText>
+
+                                            <apex:outputText rendered="{!quote.SBQQ__QuoteLanguage__c != 'EN' && item.machine.CPQ_Calculation_Total__c != null && item.machine.CPQ_Calculation_Total__c != 0}" >
+                                                <span >{!IF(item.machine.CPQ_Calculation_Total__c < 0, "-", "") & IF(ABS(item.machine.CPQ_Calculation_Total__c) >= 1000000, TEXT(FLOOR(ABS(item.machine.CPQ_Calculation_Total__c) / 1000000)) & ".", "") & IF(ABS(item.machine.CPQ_Calculation_Total__c) >= 1000, RIGHT(TEXT(FLOOR(ABS(item.machine.CPQ_Calculation_Total__c) / 1000)), 3) & ".", "") & RIGHT(TEXT(FLOOR(ABS(item.machine.CPQ_Calculation_Total__c))), 3) & "," & IF(MOD(ABS(item.machine.CPQ_Calculation_Total__c) , 1) * 100 < 10, "0" & TEXT(ROUND(MOD(ABS(item.machine.CPQ_Calculation_Total__c) , 1), 2) * 100), TEXT(MIN(ROUND(MOD(ABS(item.machine.CPQ_Calculation_Total__c) , 1), 2) * 100, 99)))} </span>
+
+                                            </apex:outputText>
+                                                {!item.machine.CPQ_Calculation_Print_Currency__c}
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+                                            <div style="page-break-inside: avoid;" >
+                                                <apex:outputText value="{!item.description.CPQ_prod_descr_requirements_Text__c}" rendered="{!showRequirementsText}" escape="false"/>
+                                            </div>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+                                            <apex:outputText value="{!baseMachine.description.CPQ_prod_descr_Additional_Text__c}" rendered="{!showAdditionalText && baseMachine.description.CPQ_Print_Colour__c == 'red'}" escape="false" style="color: red;"/>
+                                            <apex:outputText value="{!baseMachine.description.CPQ_prod_descr_Additional_Text__c}" rendered="{!showAdditionalText && baseMachine.description.CPQ_Print_Colour__c == 'blue'}" escape="false" style="color: blue;"/>
+                                            <apex:outputText value="{!baseMachine.description.CPQ_prod_descr_Additional_Text__c}" rendered="{!showAdditionalText && baseMachine.description.CPQ_Print_Colour__c == null}" escape="false" style="color: black;"/>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+
+                                </table>
+                            </div>
+                        </apex:repeat>
+
+                    </apex:outputPanel>
+                </apex:repeat>
+                <!-- MACHINE OPTIONS SPECIAL-->
+                <apex:repeat value="{!baseMachine.productGroups}" var="productGroup">
+                    <apex:outputPanel rendered="{!productGroup.specialItems && !productGroup.optionalItems}">
+                        <!-- PRODUCT GROUP OPTION TOP-->
+                        <div style="page-break-inside:avoid">
+                            <h3>
+                                    {!productGroup.name}
+                            </h3>
+                            <h4>
+                                <apex:outputText value="{!productGroup.productDescription}" escape="false"/>
+                            </h4>
+                            <table>
+
+                                <tr>
+                                    <th width="5%">{!productGroup.machineItemTop.machine.CPQ_SAP_Technical_Product_Code__c}</th>
+                                    <th width="80%"><b><apex:outputText value="{!productGroup.machineItemTop.description.CPQ_prod_desc_product_name__c}" escape="true"></apex:outputText></b></th>
+                                    <th width="15%"></th>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>
+
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+
+                                    </td>
+                                    <td>
+                                        <div style="page-break-inside: avoid;" >
+                                            <apex:outputText value="{!productGroup.machineItemTop.description.CPQ_prod_descr_med_machine_description__c}" rendered="{!quote.CPQ_Product_description_short_Medium__c == 'medium'}" escape="false"/>
+                                            <apex:outputText value="{!productGroup.machineItemTop.description.CPQ_prod_desc_short_machine_description__c}" rendered="{!quote.CPQ_Product_description_short_Medium__c == 'short'}" escape="false"/>
+                                        </div>
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>
+
+                                        <apex:outputPanel rendered="{!productGroup.machineItemTop.machine.SBQQ__Quantity__c == 1}">
+                                        {!productGroup.machineItemTop.machine.SBQQ__Quantity__c}&nbsp;{!$Label.CPQ_Piece} ...........................................................................................................................................................
+                                        </apex:outputPanel>
+
+                                        <apex:outputPanel rendered="{!productGroup.machineItemTop.machine.SBQQ__Quantity__c > 1}">
+                                        {!productGroup.machineItemTop.machine.SBQQ__Quantity__c}&nbsp;{!$Label.CPQ_Pieces} ...........................................................................................................................................................
+                                        </apex:outputPanel>
+
+                                    </td>
+                                    <td class="quote-options-price">
+                                        <apex:outputText rendered="{!quote.SBQQ__QuoteLanguage__c == 'EN'&& productGroup.machineItemTop.machine.CPQ_Calculation_Total__c != null && productGroup.machineItemTop.machine.CPQ_Calculation_Total__c != 0}" >
+                                            <span ><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!productGroup.machineItemTop.machine.CPQ_Calculation_Total__c}"/></apex:outputText> </span>
+                                        </apex:outputText>
+
+                                        <apex:outputText rendered="{!quote.SBQQ__QuoteLanguage__c != 'EN' && productGroup.machineItemTop.machine.CPQ_Calculation_Total__c != null && productGroup.machineItemTop.machine.CPQ_Calculation_Total__c != 0}" >
+                                            <span >{!IF(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c < 0, "-", "") & IF(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) >= 1000000, TEXT(FLOOR(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) / 1000000)) & ".", "") & IF(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) >= 1000, RIGHT(TEXT(FLOOR(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) / 1000)), 3) & ".", "") & RIGHT(TEXT(FLOOR(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c))), 3) & "," & IF(MOD(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) , 1) * 100 < 10, "0" & TEXT(ROUND(MOD(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) , 1), 2) * 100), TEXT(MIN(ROUND(MOD(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) , 1), 2) * 100, 99)))} </span>
+
+                                        </apex:outputText>
+                                            {!productGroup.machineItemTop.machine.CPQ_Calculation_Print_Currency__c}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>
+                                        <div style="page-break-inside: avoid;" >
+                                            <apex:outputText value="{!productGroup.machineItemTop.description.CPQ_prod_descr_requirements_Text__c}" rendered="{!showRequirementsText}" escape="false"/>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>
+                                        <apex:outputText value="{!baseMachine.description.CPQ_prod_descr_Additional_Text__c}" rendered="{!showAdditionalText && baseMachine.description.CPQ_Print_Colour__c == 'red'}" escape="false" style="color: red;"/>
+                                        <apex:outputText value="{!baseMachine.description.CPQ_prod_descr_Additional_Text__c}" rendered="{!showAdditionalText && baseMachine.description.CPQ_Print_Colour__c == 'blue'}" escape="false" style="color: blue;"/>
+                                        <apex:outputText value="{!baseMachine.description.CPQ_prod_descr_Additional_Text__c}" rendered="{!showAdditionalText && baseMachine.description.CPQ_Print_Colour__c == null}" escape="false" style="color: black;"/>
+                                    </td>
+                                    <td></td>
+                                </tr>
+
+
+                            </table>
+                        </div>
+                        <!-- PRODUCT GROUP OPTIONS -->
+                        <apex:repeat value="{!productGroup.machineItems}" var="item">
+                            <div style="page-break-inside:avoid">
+                                <table>
+
+                                    <tr>
+                                        <th width="5%">{!item.machine.CPQ_SAP_Technical_Product_Code__c}</th>
+                                        <th width="80%"><b>{!item.machine.CPQ_Special_Option_Name__c}</b></th>
+                                        <th width="15%"></th>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+
+                                        </td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+                                            <apex:outputText value="{!item.machine.CPQ_Special_Option_Description__c}" escape="false"/>
+                                        </td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+
+                                            <apex:outputPanel rendered="{!item.machine.SBQQ__Quantity__c == 1}">
+                                            {!item.machine.SBQQ__Quantity__c}&nbsp;{!$Label.CPQ_Piece} ...........................................................................................................................................................
+                                            </apex:outputPanel>
+
+                                            <apex:outputPanel rendered="{!item.machine.SBQQ__Quantity__c > 1}">
+                                            {!item.machine.SBQQ__Quantity__c}&nbsp;{!$Label.CPQ_Pieces} ...........................................................................................................................................................
+                                            </apex:outputPanel>
+
+                                        </td>
+                                        <td class="quote-options-price">
+                                            <apex:outputText rendered="{!quote.SBQQ__QuoteLanguage__c == 'EN' && item.machine.CPQ_Calculation_Total__c != 0}" >
+                                                <span ><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!item.machine.CPQ_Calculation_Total__c}"/></apex:outputText> </span>
+                                            </apex:outputText>
+                                            <apex:outputText rendered="{!quote.SBQQ__QuoteLanguage__c != 'EN' && item.machine.CPQ_Calculation_Total__c != 0}" >
+                                                <span >{!IF(item.machine.CPQ_Calculation_Total__c < 0, "-", "") & IF(ABS(item.machine.CPQ_Calculation_Total__c) >= 1000000, TEXT(FLOOR(ABS(item.machine.CPQ_Calculation_Total__c) / 1000000)) & ".", "") & IF(ABS(item.machine.CPQ_Calculation_Total__c) >= 1000, RIGHT(TEXT(FLOOR(ABS(item.machine.CPQ_Calculation_Total__c) / 1000)), 3) & ".", "") & RIGHT(TEXT(FLOOR(ABS(item.machine.CPQ_Calculation_Total__c))), 3) & "," & IF(MOD(ABS(item.machine.CPQ_Calculation_Total__c) , 1) * 100 < 10, "0" & TEXT(ROUND(MOD(ABS(item.machine.CPQ_Calculation_Total__c) , 1), 2) * 100), TEXT(MIN(ROUND(MOD(ABS(item.machine.CPQ_Calculation_Total__c) , 1), 2) * 100, 99)))} </span>
+
+                                            </apex:outputText>
+                                                {!item.machine.CPQ_Calculation_Print_Currency__c}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                        </apex:repeat>
+
+                    </apex:outputPanel>
+                </apex:repeat>
+
+                <!-- MACHINE PACKAGE LIST TOTAL ROUNDED -->
+                <div class="machine-total">
+                {!$Label.CPQ_Machine_Total}:&nbsp;
+                    <apex:outputText rendered="{!quote.SBQQ__QuoteLanguage__c == 'EN'}" >
+                        <span ><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!baseMachine.machine.CPQ_Printout_Package_Total_for_TuC__c}"/></apex:outputText> </span>
+                    </apex:outputText>
+                    <apex:outputText rendered="{!quote.SBQQ__QuoteLanguage__c != 'EN'}" >
+                        <span >{!IF(baseMachine.machine.CPQ_Printout_Package_Total_for_TuC__c < 0, "-", "") & IF(ABS(baseMachine.machine.CPQ_Printout_Package_Total_for_TuC__c) >= 1000000, TEXT(FLOOR(ABS(baseMachine.machine.CPQ_Printout_Package_Total_for_TuC__c) / 1000000)) & ".", "") & IF(ABS(baseMachine.machine.CPQ_Printout_Package_Total_for_TuC__c) >= 1000, RIGHT(TEXT(FLOOR(ABS(baseMachine.machine.CPQ_Printout_Package_Total_for_TuC__c) / 1000)), 3) & ".", "") & RIGHT(TEXT(FLOOR(ABS(baseMachine.machine.CPQ_Printout_Package_Total_for_TuC__c))), 3) & "," & IF(MOD(ABS(baseMachine.machine.CPQ_Printout_Package_Total_for_TuC__c) , 1) * 100 < 10, "0" & TEXT(ROUND(MOD(ABS(baseMachine.machine.CPQ_Printout_Package_Total_for_TuC__c) , 1), 2) * 100), TEXT(MIN(ROUND(MOD(ABS(baseMachine.machine.CPQ_Printout_Package_Total_for_TuC__c) , 1), 2) * 100, 99)))} </span>
+
+                    </apex:outputText>
+                        {!baseMachine.machine.CPQ_Calculation_Print_Currency__c}&nbsp;
+                </div>
+
+                <!-- MACHINE OPTIONS OPTIONAL-->
+                <apex:repeat value="{!baseMachine.productGroups}" var="productGroup">
+                    <apex:outputPanel rendered="{!productGroup.optionalItems}">
+                        <!-- PRODUCT GROUP OPTION TOP-->
+                        <div style="page-break-inside:avoid">
+                            <h3>
+                                    {!productGroup.name}
+                            </h3>
+                            <h4>
+                                <apex:outputText value="{!productGroup.productDescription}" escape="false"/>
+                            </h4>
+                            <table>
+
+                                <tr>
+                                    <th width="5%">{!productGroup.machineItemTop.machine.CPQ_SAP_Technical_Product_Code__c}</th>
+                                    <th width="80%"><b><apex:outputText value="{!productGroup.machineItemTop.description.CPQ_prod_desc_product_name__c}" escape="true"></apex:outputText></b></th>
+                                    <th width="15%"></th>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>
+
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+
+                                    </td>
+                                    <td>
+                                        <div style="page-break-inside: avoid;" >
+                                            <apex:outputText value="{!productGroup.machineItemTop.description.CPQ_prod_descr_med_machine_description__c}" rendered="{!quote.CPQ_Product_description_short_Medium__c == 'medium'}" escape="false"/>
+                                            <apex:outputText value="{!productGroup.machineItemTop.description.CPQ_prod_desc_short_machine_description__c}" rendered="{!quote.CPQ_Product_description_short_Medium__c == 'short'}" escape="false"/>
+                                        </div>
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>
+
+                                        <apex:outputPanel rendered="{!productGroup.machineItemTop.machine.SBQQ__Quantity__c == 1}">
+                                        {!productGroup.machineItemTop.machine.SBQQ__Quantity__c}&nbsp;{!$Label.CPQ_Piece} ...........................................................................................................................................................
+                                        </apex:outputPanel>
+
+                                        <apex:outputPanel rendered="{!productGroup.machineItemTop.machine.SBQQ__Quantity__c > 1}">
+                                        {!productGroup.machineItemTop.machine.SBQQ__Quantity__c}&nbsp;{!$Label.CPQ_Pieces} ...........................................................................................................................................................
+                                        </apex:outputPanel>
+
+                                    </td>
+                                    <td class="quote-options-price">
+                                        <apex:outputText rendered="{!quote.SBQQ__QuoteLanguage__c == 'EN'&& productGroup.machineItemTop.machine.CPQ_Calculation_Total__c != null && productGroup.machineItemTop.machine.CPQ_Calculation_Total__c != 0}" >
+                                            <span ><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!productGroup.machineItemTop.machine.CPQ_Calculation_Total__c}"/></apex:outputText> </span>
+                                        </apex:outputText>
+
+                                        <apex:outputText rendered="{!quote.SBQQ__QuoteLanguage__c != 'EN' && productGroup.machineItemTop.machine.CPQ_Calculation_Total__c != null && productGroup.machineItemTop.machine.CPQ_Calculation_Total__c != 0}" >
+                                            <span >{!IF(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c < 0, "-", "") & IF(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) >= 1000000, TEXT(FLOOR(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) / 1000000)) & ".", "") & IF(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) >= 1000, RIGHT(TEXT(FLOOR(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) / 1000)), 3) & ".", "") & RIGHT(TEXT(FLOOR(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c))), 3) & "," & IF(MOD(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) , 1) * 100 < 10, "0" & TEXT(ROUND(MOD(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) , 1), 2) * 100), TEXT(MIN(ROUND(MOD(ABS(productGroup.machineItemTop.machine.CPQ_Calculation_Total__c) , 1), 2) * 100, 99)))} </span>
+
+                                        </apex:outputText>
+                                            {!productGroup.machineItemTop.machine.CPQ_Calculation_Print_Currency__c}
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>
+                                        <div style="page-break-inside: avoid;" >
+                                            <apex:outputText value="{!productGroup.machineItemTop.description.CPQ_prod_descr_requirements_Text__c}" rendered="{!showRequirementsText}" escape="false"/>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>
+                                        <apex:outputText value="{!baseMachine.description.CPQ_prod_descr_Additional_Text__c}" rendered="{!showAdditionalText && baseMachine.description.CPQ_Print_Colour__c == 'red'}" escape="false" style="color: red;"/>
+                                        <apex:outputText value="{!baseMachine.description.CPQ_prod_descr_Additional_Text__c}" rendered="{!showAdditionalText && baseMachine.description.CPQ_Print_Colour__c == 'blue'}" escape="false" style="color: blue;"/>
+                                        <apex:outputText value="{!baseMachine.description.CPQ_prod_descr_Additional_Text__c}" rendered="{!showAdditionalText && baseMachine.description.CPQ_Print_Colour__c == null}" escape="false" style="color: black;"/>
+                                    </td>
+                                    <td></td>
+                                </tr>
+
+
+                            </table>
+                        </div>
+                        <!-- PRODUCT GROUP OPTIONS -->
+                        <apex:repeat value="{!productGroup.machineItems}" var="item">
+                            <div style="page-break-inside:avoid">
+                                <table>
+                                    <tr>
+                                        <th width="5%">{!item.machine.CPQ_SAP_Technical_Product_Code__c}</th>
+                                        <th width="80%"><b><apex:outputText value="{!item.description.CPQ_prod_desc_product_name__c}" escape="true"></apex:outputText></b></th>
+                                        <th width="15%"></th>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+
+                                        </td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+                                            <div style="page-break-inside: avoid;" >
+                                                <apex:outputText value="{!item.description.CPQ_prod_descr_med_machine_description__c}" rendered="{!quote.CPQ_Product_description_short_Medium__c == 'medium'}" escape="false"/>
+                                                <apex:outputText value="{!item.description.CPQ_prod_desc_short_machine_description__c}" rendered="{!quote.CPQ_Product_description_short_Medium__c == 'short'}" escape="false"/>
+                                            </div>
+                                        </td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+
+                                            <apex:outputPanel rendered="{!item.machine.SBQQ__Quantity__c == 1}">
+                                            {!item.machine.SBQQ__Quantity__c}&nbsp;{!$Label.CPQ_Piece} ...........................................................................................................................................................
+                                            </apex:outputPanel>
+
+                                            <apex:outputPanel rendered="{!item.machine.SBQQ__Quantity__c > 1}">
+                                            {!item.machine.SBQQ__Quantity__c}&nbsp;{!$Label.CPQ_Pieces} ...........................................................................................................................................................
+                                            </apex:outputPanel>
+
+                                        </td>
+                                        <td class="quote-options-price">
+                                            <apex:outputText rendered="{!quote.SBQQ__QuoteLanguage__c == 'EN'}" >
+                                                <span ><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!IF(item.machine.CPQ_Calculation_Total__c == 0, NULL, item.machine.CPQ_Calculation_Total__c)}"/></apex:outputText> </span>
+                                            </apex:outputText>
+                                            <apex:outputText rendered="{!quote.SBQQ__QuoteLanguage__c != 'EN'}" >
+                                                <span >{!IF(item.machine.CPQ_Calculation_Total__c == 0, NULL, IF(item.machine.CPQ_Calculation_Total__c < 0, "-", "") & IF(ABS(item.machine.CPQ_Calculation_Total__c) >= 1000000, TEXT(FLOOR(ABS(item.machine.CPQ_Calculation_Total__c) / 1000000)) & ".", "") & IF(ABS(item.machine.CPQ_Calculation_Total__c) >= 1000, RIGHT(TEXT(FLOOR(ABS(item.machine.CPQ_Calculation_Total__c) / 1000)), 3) & ".", "") & RIGHT(TEXT(FLOOR(ABS(item.machine.CPQ_Calculation_Total__c))), 3) & "," & IF(MOD(ABS(item.machine.CPQ_Calculation_Total__c) , 1) * 100 < 10, "0" & TEXT(ROUND(MOD(ABS(item.machine.CPQ_Calculation_Total__c) , 1), 2) * 100), TEXT(MIN(ROUND(MOD(ABS(item.machine.CPQ_Calculation_Total__c) , 1), 2) * 100, 99))))} </span>
+
+                                            </apex:outputText>
+                                                {!item.machine.CPQ_Calculation_Print_Currency__c}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                        </apex:repeat>
+                    </apex:outputPanel>
+                </apex:repeat>
+            </div>
+
+            <apex:outputPanel rendered="{!baseMachine.machineOptions.size > 0}">
+                <div class="quote-additionaloptions content-block">
+                    <h2>
+                            {!$Label.CPQ_Additional_Machine_Info}
+                    </h2>
+                    <table>
+                        <apex:repeat value="{!baseMachine.machineOptions}" var="option">
+                            <tr>
+                                <th width="30%">{!option.CPQ_machine_options_name__c}</th>
+                                <td>
+                                    <apex:outputText value="{!option.CPQ_Additional_Text__c}" escape="false"/>
+                                </td>
+                            </tr>
+                        </apex:repeat>
+                    </table>
+                </div>
+            </apex:outputPanel>
+
+            <!-- TERMS AND CONDITIONS-->
+            <div class="quote-terms content-block" >
+                <h2>
+                        {!$Label.CPQ_Terms_Conditions}
+                </h2>
+
+                <apex:repeat value="{!baseMachine.termsAndConditions}" var="term">
+                    <apex:outputPanel rendered="{!term.tac.CPQ_manual_values_exist__c > 0}">
+                        <div style="page-break-inside: avoid;">
+                            <h3>{!term.tac.CPQ_TaC_Number_Text__c}</h3>
+                            <p></p>
+                            <apex:outputText value="{!term.tac.CPQ_TaC_Special_Terms_and_Conditions__c}" escape="false"/>
+
+                            <apex:repeat value="{!term.paymentConditions}" var="payCon" rendered="{!term.tac.CPQ_Is_Payment_Condition__c}" >
+                                <table>
+                                    <tr>
+                                        <td width="15px" >
+
+                                        </td>
+                                        <td>
+                                            -&nbsp;
+                                            <apex:outputText rendered="{!quote.SBQQ__QuoteLanguage__c == 'EN'}" ><span ><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!payCon.CPQ_manual_Payment_Value__c}"/></apex:outputText> </span></apex:outputText>
+                                            <apex:outputText rendered="{!quote.SBQQ__QuoteLanguage__c != 'EN'}" ><span >{!IF(payCon.CPQ_manual_Payment_Value__c < 0, "-", "") & IF(ABS(payCon.CPQ_manual_Payment_Value__c) >= 1000000, TEXT(FLOOR(ABS(payCon.CPQ_manual_Payment_Value__c) / 1000000)) & ".", "") & IF(ABS(payCon.CPQ_manual_Payment_Value__c) >= 1000, RIGHT(TEXT(FLOOR(ABS(payCon.CPQ_manual_Payment_Value__c) / 1000)), 3) & ".", "") & RIGHT(TEXT(FLOOR(ABS(payCon.CPQ_manual_Payment_Value__c))), 3) & "," & IF(MOD(ABS(payCon.CPQ_manual_Payment_Value__c) , 1) * 100 < 10, "0" & TEXT(ROUND(MOD(ABS(payCon.CPQ_manual_Payment_Value__c) , 1), 2) * 100), TEXT(MIN(ROUND(MOD(ABS(payCon.CPQ_manual_Payment_Value__c) , 1), 2) * 100, 99)))}</span></apex:outputText>
+                                            &nbsp;{!baseMachine.machine.CPQ_Calculation_Print_Currency__c}&nbsp;<apex:outputText value="{!payCon.Z_Text__c}" escape="false"/>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                            </apex:repeat>
+                        </div>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!term.tac.CPQ_manual_values_exist__c < 1}">
+                        <div style="page-break-inside: avoid;">
+                            <h3>{!term.tac.CPQ_TaC_Number_Text__c}</h3>
+                            <p></p>
+                            <apex:outputText value="{!term.tac.CPQ_TaC_Special_Terms_and_Conditions__c}" escape="false"/>
+
+                            <apex:repeat value="{!term.paymentConditions}" var="payCon" rendered="{!term.tac.CPQ_Is_Payment_Condition__c}" >
+                                <table>
+                                    <tr>
+                                        <td width="15px" >
+
+                                        </td>
+                                        <td>
+                                            -&nbsp;{!payCon.Z_Value__c}&nbsp;%,&nbsp;
+                                            <apex:outputText rendered="{!quote.SBQQ__QuoteLanguage__c == 'EN'}" ><span ><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!payCon.CPQ_Currency_Value__c}"/></apex:outputText> </span></apex:outputText>
+                                            <apex:outputText rendered="{!quote.SBQQ__QuoteLanguage__c != 'EN'}" ><span >{!IF(payCon.CPQ_Currency_Value__c < 0, "-", "") & IF(ABS(payCon.CPQ_Currency_Value__c) >= 1000000, TEXT(FLOOR(ABS(payCon.CPQ_Currency_Value__c) / 1000000)) & ".", "") & IF(ABS(payCon.CPQ_Currency_Value__c) >= 1000, RIGHT(TEXT(FLOOR(ABS(payCon.CPQ_Currency_Value__c) / 1000)), 3) & ".", "") & RIGHT(TEXT(FLOOR(ABS(payCon.CPQ_Currency_Value__c))), 3) & "," & IF(MOD(ABS(payCon.CPQ_Currency_Value__c) , 1) * 100 < 10, "0" & TEXT(ROUND(MOD(ABS(payCon.CPQ_Currency_Value__c) , 1), 2) * 100), TEXT(MIN(ROUND(MOD(ABS(payCon.CPQ_Currency_Value__c) , 1), 2) * 100, 99)))}</span></apex:outputText>
+                                            &nbsp;{!baseMachine.machine.CPQ_Calculation_Print_Currency__c}&nbsp;<apex:outputText value="{!payCon.Z_Text__c}" escape="false"/>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                            </apex:repeat>
+                        </div>
+                    </apex:outputPanel>
+                </apex:repeat>
+            </div>
+        </div>
+    </apex:repeat>
+
+    <!-- GENERAL TERMS AND CONDITIONS -->
+    <div class="quote-terms content-block" style="page-break-before:always; font-size:9px">
+        <h2>
+                {!$Label.CPQ_General_Terms}
+        </h2>
+
+        <apex:repeat value="{!generalTermsConditions}" var="generalTerm">
+            <div style="page-break-inside: avoid;" >
+                <h3>{!generalTerm.CPQ_GTaC_Text_Name__c}</h3>
+                <p></p>
+                <apex:outputText value="{!generalTerm.CPQ_GTaC_Text_Long__c}" escape="false"/>
+            </div>
+        </apex:repeat>
+    </div>
+    </body>
+    </html>
+
+</apex:page>

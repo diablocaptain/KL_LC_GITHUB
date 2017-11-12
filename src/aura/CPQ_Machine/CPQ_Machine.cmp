@@ -1,0 +1,97 @@
+<!--Modal.cmp-->
+<aura:component description="CPQ_Machine" controller="CPQ_QuoteControllerExtension" implements="flexipage:availableForAllPageTypes" access="global">
+
+
+    <!-- attributes -->
+    <aura:attribute name="groupId" type="Id" access="global" />
+    <aura:attribute name="quoteLines" type="SBQQ__QuoteLine__c" access="global" />
+    <aura:attribute name="payConComponent" type="Aura.Component[]" />
+    <aura:attribute name="tacComponent" type="Aura.Component[]" />
+
+    <!--Initialize the component-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <div class="slds-box">
+        <!-- MEINE MASCHINE -->
+        <div class="slds-page-header" style="cursor: pointer;" onclick="{!c.sectionOne}">
+            <section class="slds-clearfix">
+                <div class="slds-float--left ">
+                    <lightning:icon class="slds-show" aura:id="articleOne" iconName="utility:add" size="x-small" alternativeText="Indicates add"/>
+                    <lightning:icon class="slds-hide" aura:id="articleOne" iconName="utility:dash" size="x-small" alternativeText="Indicates dash"/>
+                </div>
+                <div class="slds-m-left--large">{!v.quoteLines[0].SBQQ__Group__r.Name}</div>
+            </section>
+        </div>
+        <div class="slds-hide slds-p-around--medium" aura:id="articleOne">
+
+            <table class="slds-table slds-table--bordered slds--table--striped slds-table--cell-buffer" >
+                <thead>
+                <tr class="slds-text-heading--label">
+                    <th scope="col"><span class="slds-truncate">{!$Label.c.CPQ_Quote_Line}</span></th>
+                    <th scope="col"><span class="slds-truncate">{!$Label.c.CPQ_Group}</span></th>
+                    <th scope="col"><span class="slds-truncate">{!$Label.c.CPQ_Product}</span></th>
+                    <th scope="col"><span class="slds-truncate">{!$Label.c.CPQ_Net_Unit_Price}</span></th>
+                    <th scope="col"><span class="slds-truncate">{!$Label.c.CPQ_Quantity}</span></th>
+                    <th scope="col"><span class="slds-truncate">{!$Label.c.CPQ_Net_Total}</span></th>
+                    <th scope="col"><span class="slds-truncate">Delivery Time (in month)</span></th>
+                </tr>
+                </thead>
+                <aura:iteration items="{!v.quoteLines}" var="quoteLine">
+                    <tbody>
+                    <tr>
+                        <td>
+                            <a href="{!'/one/one.app?#/sObject/'+ quoteLine.Id + '/view'}"
+                               class="slds-text-link" >
+                                    {!quoteLine.Name}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{!'/one/one.app?#/sObject/'+ quoteLine.SBQQ__Group__c + '/view'}"
+                               class="slds-text-link" >
+                                    {!quoteLine.SBQQ__Group__r.Name}
+
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{!'/one/one.app?#/sObject/'+ quoteLine.SBQQ__Product__c + '/view'}"
+                               class="slds-text-link" >
+                                <aura:if isTrue="{!quoteLine.CPQ_Is_Special_Options__c}">
+                                {!quoteLine.CPQ_Special_Option_Name__c}
+
+                                    <aura:set attribute="else">
+                                            {!quoteLine.CPQ_Quote_Product__r.Name}
+                                    </aura:set>
+                                </aura:if>
+
+                            </a>
+                        </td>
+                        <td>
+                            <lightning:formattedNumber value="{!quoteLine.SBQQ__NetPrice__c}" style="currency" currencyCode="{!quoteLine.CurrencyIsoCode}" />
+                        </td>
+                        <td>
+                            <lightning:formattedNumber value="{!quoteLine.SBQQ__Quantity__c}" style="decimal"/>
+                        </td>
+                        <td>
+                            <lightning:formattedNumber value="{!quoteLine.SBQQ__NetTotal__c}" style="currency" currencyCode="{!quoteLine.CurrencyIsoCode}" />
+                        </td>
+                        <td>
+                                {!quoteLine.CPQ_Time_of_Delivery_in_Month_for_TaC__c}
+                        </td>
+                    </tr>
+                    </tbody>
+                </aura:iteration>
+            </table>
+            <div class="slds-p-horizontal_medium slds-m-top_xx-large">
+
+                    {!v.tacComponent}
+            </div>
+            <div class="slds-p-horizontal_medium slds-m-top_xx-large">
+
+                    {!v.payConComponent}
+            </div>
+        </div>
+    </div>
+
+
+
+</aura:component>

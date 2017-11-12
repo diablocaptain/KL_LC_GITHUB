@@ -1,0 +1,22 @@
+<!-- CPQ_Quote_ShowMachineLineItems.cmp -->
+<aura:component controller="CPQ_QuoteControllerExtension" implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global">
+    
+    <!-- attributes -->
+    <aura:attribute name="quoteLines" type="SBQQ__QuoteLine__c" access="global" />
+    <aura:attribute name="recordId" type="Id" />
+    
+    <!-- doInit -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <lightning:card >
+        <div class="slds-p-horizontal_medium">
+            <!-- Title -->
+            <p class="slds-text-heading--label slds-m-bottom--small">
+                    {!$Label.c.CPQ_Machine}
+            </p>
+
+                {!v.body}
+        </div>
+    </lightning:card>
+
+</aura:component>

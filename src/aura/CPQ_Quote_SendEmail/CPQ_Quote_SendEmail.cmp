@@ -1,0 +1,105 @@
+<!--
+ - Created by MatsBöhler on 10.10.2017.
+ -->
+<aura:component controller="CPQ_QuoteControllerExtension"
+                description="CPQ_Quote_SendEmail"
+                implements="flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickActionWithoutHeader"
+                access="global">
+
+    <!--Part 1 [for attribute declare]-->
+    <aura:attribute name="email" type="string"/>
+    <aura:attribute name="subject" type="string"/>
+    <aura:attribute name="body" type="string"/>
+    <aura:attribute name="cc" type="string"/>
+    <aura:attribute name="mailStatus" type="boolean" default="false"/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="quote" type="SBQQ__Quote__c"/>
+
+    <!-- doInit -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <lightning:card iconName="standard:email">
+        <div class="slds-p-horizontal_medium">
+            <!--loading spinner start... style=Brand Medium (blue dots)-->
+            <aura:if isTrue="{!v.Spinner}">
+                <div aura:id="spinnerId" class="slds-spinner_container">
+                    <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                        <span class="slds-assistive-text">Loading</span>
+                        <div class="slds-spinner__dot-a"></div>
+                        <div class="slds-spinner__dot-b"></div>
+                    </div>
+                </div>
+            </aura:if>
+            <!-- Loading spinner end-->
+
+
+            <!---Part 2 [header part] -->
+            <div class="slds-page-header" role="banner">
+                <h1 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="this should match">
+                    Email in Lightning
+                </h1>
+                <div class="slds-text-color--weak">part of CPQ project</div>
+            </div>
+
+            <!---Part 3 [message display part] -->
+            <aura:if isTrue="{!v.mailStatus}">
+                <div role="alertdialog" tabindex="-1" aria-labelledby="prompt-heading-id" aria-describedby="prompt-message-wrapper" class="slds-modal slds-fade-in-open slds-modal--prompt">
+                    <div class="slds-modal__container">
+                        <div class="slds-modal__header slds-theme--success slds-theme--alert-texture">
+                            <h2 class="slds-text-heading--medium" id="prompt-heading-id">Mail Status</h2>
+                        </div>
+                        <div class="slds-modal__content slds-p-around--medium">
+                            <div>
+                                <p>Email sent successfully to {!v.email}</p>
+                            </div>
+                        </div>
+                        <div class="slds-modal__footer slds-theme--default">
+                            <button class="slds-button slds-button--brand" onclick="{!c.closeMessage}">Close</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-backdrop slds-backdrop--open"></div>
+            </aura:if>
+
+            <!---Part 4 [mail fourm part]-->
+            <div class="slds-m-around--medium">
+                <div class="slds-container--medium">
+                    <div class="slds-form--stacked">
+                        <div class="slds-form-element">
+                            <label class="slds-form-element__label" for="CC">To:</label>
+                            <div class="slds-form-element__control">
+                                <ui:inputEmail class="slds-input" aura:id="email"  value="{!v.email}" required="true" placeholder="abc@email.com"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element">
+                            <label class="slds-form-element__label" for="CC">CC:</label>
+                            <div class="slds-form-element__control">
+                                <ui:inputEmail class="slds-input" aura:id="cc"  value="{!v.cc}" required="true" placeholder="abc@email.com"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element">
+                            <label class="slds-form-element__label" for="CC">Subject</label>
+                            <div class="slds-form-element__control">
+                                <ui:inputText class="slds-input" aura:id="subject"  value="{!v.subject}" placeholder="Subject"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element">
+                            <label class="slds-form-element__label" for="textareaSample2">Mail Body</label>
+                            <div class="slds-form-element__control">
+                                <lightning:inputRichText aura:id="body" value="{!v.body}" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-docked-form-footer">
+                <lightning:button label="Send E-mail" class="slds-button slds-button_neutral" onclick="{!c.sendMail}"  ></lightning:button>
+                <lightning:button label="Cancel" class="slds-button slds-button_neutral" onclick="{!c.onCancel}"  ></lightning:button>
+            </div>
+        </div>
+    </lightning:card>
+
+
+</aura:component>
